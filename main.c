@@ -2,6 +2,7 @@
 #include <stdlib.h>
 void UI_Menu()
 {
+    // demo UI
     while (1)
     {
         puts("\t\t\t==============================");
