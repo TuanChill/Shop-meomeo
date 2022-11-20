@@ -8,10 +8,12 @@
 #include <unistd.h>
 
 #define folderDirectory "C:/KittyCat/"
+#define catFolder "C:/KittyCat/Cats/"
 
 void create_folder()
 {
     mkdir(folderDirectory);
+    mkdir(catFolder);
 }
 
 // struct of cat
@@ -69,15 +71,20 @@ void CreateCat()
 {
 
     CAT x;
-    char dir[20] = folderDirectory;
-    x.id = GenerateIdCat();
-    char idFile[4];
-    itoa(x.id, idFile, 10);
-    strcat(dir, idFile);
-    strcat(dir, ".txt");
-    printf("%s\n", dir);
-    FILE *fptr;
     char check;
+    int CatId = GenerateIdCat();
+    char dir[20] = catFolder;
+    char idFile[4];
+    itoa(CatId, idFile, 10);
+    strncat(dir, idFile, 20);
+    strncat(dir, ".txt", 100);
+    FILE *fptr;
+    if ((fptr = fopen(dir, "w")) == NULL)
+    {
+        printf("Error opening/creating file!!\n");
+        exit(0);
+    }
+
     puts("\t\t\t==============================");
     puts("\t\t\t     Create a new Kitty  ");
     puts("\t\t\t==============================");
@@ -97,6 +104,7 @@ void CreateCat()
     scanf("%d", &x.sex);
     printf("\nInput the vaccination of your kitty (1-yes or 0-not): ");
     scanf("%d", &x.vaccination);
+    x.id = CatId;
     // output data of cat you entered
     system("cls");
     printf("\nYour information of kitty that you have entered:");
@@ -128,11 +136,6 @@ void CreateCat()
     {
     case 'y':
     case 'Y':
-        if ((fptr = fopen(dir, "w")) == NULL)
-        {
-            printf("Error opening/creating file!!\n");
-            exit(0);
-        }
         fwrite(&x, sizeof(x), 1, fptr);
         printf("\nKitty is saved");
         fclose(fptr);
