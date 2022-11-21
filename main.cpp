@@ -31,10 +31,11 @@ void SubId()
 {
     int fileID;
     FILE *fptr;
+    fptr = fopen("C:/KittyCat/CatID", "r");
     fscanf(fptr, "%d", &fileID);
     fileID -= 1;
     fclose(fptr);
-    fptr = fopen("C:/KittyCat/CatID.txt", "w");
+    fptr = fopen("C:/KittyCat/CatID", "w");
     fprintf(fptr, "%d", fileID);
     fclose(fptr);
 }
@@ -43,10 +44,10 @@ int GenerateIdCat()
 {
     int fileID;
     FILE *fptr;
-    if ((fptr = fopen("C:/KittyCat/CatID.txt", "rb")) == NULL)
+    if ((fptr = fopen("C:/KittyCat/CatID", "rb")) == NULL)
     {
         int id = 1;
-        fptr = fopen("C:/KittyCat/CatID.txt", "wb");
+        fptr = fopen("C:/KittyCat/CatID", "wb");
         fprintf(fptr, "%d", id);
         fclose(fptr);
 
@@ -57,7 +58,7 @@ int GenerateIdCat()
         fscanf(fptr, "%d", &fileID);
         fileID += 1;
         fclose(fptr);
-        fptr = fopen("C:/KittyCat/CatID.txt", "wb");
+        fptr = fopen("C:/KittyCat/CatID", "wb");
         fprintf(fptr, "%d", fileID);
         fclose(fptr);
 
