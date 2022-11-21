@@ -155,7 +155,7 @@ void CreateCat()
     scanf("%s", &again);
     if (again == 'y' || again == 'Y')
     {
-        system('cls');
+        system("cls");
         CreateCat();
     }
 }
