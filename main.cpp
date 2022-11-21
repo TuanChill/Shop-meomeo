@@ -8,12 +8,10 @@
 #include <unistd.h>
 
 #define folderDirectory "C:/KittyCat/"
-#define catFolder "C:/KittyCat/Cats/"
 
 void create_folder()
 {
     mkdir(folderDirectory);
-    mkdir(catFolder);
 }
 
 // struct of cat
@@ -45,10 +43,10 @@ int GenerateIdCat()
 {
     int fileID;
     FILE *fptr;
-    if ((fptr = fopen("C:/KittyCat/CatID.txt", "r")) == NULL)
+    if ((fptr = fopen("C:/KittyCat/CatID.txt", "rb")) == NULL)
     {
         int id = 1;
-        fptr = fopen("C:/KittyCat/CatID.txt", "w");
+        fptr = fopen("C:/KittyCat/CatID.txt", "wb");
         fprintf(fptr, "%d", id);
         fclose(fptr);
 
@@ -59,7 +57,7 @@ int GenerateIdCat()
         fscanf(fptr, "%d", &fileID);
         fileID += 1;
         fclose(fptr);
-        fptr = fopen("C:/KittyCat/CatID.txt", "w");
+        fptr = fopen("C:/KittyCat/CatID.txt", "wb");
         fprintf(fptr, "%d", fileID);
         fclose(fptr);
 
@@ -73,13 +71,10 @@ void CreateCat()
     CAT x;
     char check;
     int CatId = GenerateIdCat();
-    char dir[20] = catFolder;
-    char idFile[4];
-    itoa(CatId, idFile, 10);
-    strncat(dir, idFile, 20);
-    strncat(dir, ".txt", 100);
+    char dir[20] = folderDirectory;
+    strncat(dir, "CatData", 100);
     FILE *fptr;
-    if ((fptr = fopen(dir, "w")) == NULL)
+    if ((fptr = fopen(dir, "ab")) == NULL)
     {
         printf("Error opening/creating file!!\n");
         exit(0);
