@@ -150,6 +150,14 @@ void CreateCat()
         SubId();
         break;
     }
+    char again;
+    printf("\nDo you want to re-input a new cat(Y/N): ");
+    scanf("%s", &again);
+    if (again == 'y' || again == 'Y')
+    {
+        system('cls');
+        CreateCat();
+    }
 }
 
 void UI_Menu()
