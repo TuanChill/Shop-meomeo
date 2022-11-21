@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #define folderDirectory "C:/KittyCat/"
+#define folderCatData "C:/KittyCat/CatData"
+#define fileCatID "C:/KittyCat/CatID"
 
 void create_folder()
 {
@@ -31,11 +31,11 @@ void SubId()
 {
     int fileID;
     FILE *fptr;
-    fptr = fopen("C:/KittyCat/CatID", "r");
+    fptr = fopen(fileCatID, "rb");
     fscanf(fptr, "%d", &fileID);
     fileID -= 1;
     fclose(fptr);
-    fptr = fopen("C:/KittyCat/CatID", "w");
+    fptr = fopen(fileCatID, "wb");
     fprintf(fptr, "%d", fileID);
     fclose(fptr);
 }
@@ -44,10 +44,10 @@ int GenerateIdCat()
 {
     int fileID;
     FILE *fptr;
-    if ((fptr = fopen("C:/KittyCat/CatID", "rb")) == NULL)
+    if ((fptr = fopen(fileCatID, "rb")) == NULL)
     {
         int id = 1;
-        fptr = fopen("C:/KittyCat/CatID", "wb");
+        fptr = fopen(fileCatID, "wb");
         fprintf(fptr, "%d", id);
         fclose(fptr);
 
@@ -58,7 +58,7 @@ int GenerateIdCat()
         fscanf(fptr, "%d", &fileID);
         fileID += 1;
         fclose(fptr);
-        fptr = fopen("C:/KittyCat/CatID", "wb");
+        fptr = fopen(fileCatID, "wb");
         fprintf(fptr, "%d", fileID);
         fclose(fptr);
 
@@ -72,8 +72,7 @@ void CreateCat()
     CAT x;
     char check;
     int CatId = GenerateIdCat();
-    char dir[20] = folderDirectory;
-    strncat(dir, "CatData", 100);
+    char dir[20] = folderCatData;
     FILE *fptr;
     if ((fptr = fopen(dir, "ab")) == NULL)
     {
@@ -98,8 +97,18 @@ void CreateCat()
     fflush(stdin);
     printf("\nInput the sex of your kitty (0-female or 1-male): ");
     scanf("%d", &x.sex);
+    while (x.sex != 0 && x.sex != 1)
+    {
+        printf("\nInvalid option, re-input the sex of your kitty");
+        scanf("%d", &x.sex);
+    }
     printf("\nInput the vaccination of your kitty (1-yes or 0-not): ");
     scanf("%d", &x.vaccination);
+    while (x.vaccination != 0 && x.vaccination != 1)
+    {
+        printf("\nInvalid option, re-input the vaccination of your kitty");
+        scanf("%d", &x.vaccination);
+    }
     x.id = CatId;
     // output data of cat you entered
     system("cls");
@@ -127,33 +136,50 @@ void CreateCat()
     }
     printf("\n*********************************************");
     printf("\nDo you want to save this kitty(Y/N): ");
-    scanf("%s", &check);
-    switch (check)
+SAVE:
+    do
     {
-    case 'y':
-    case 'Y':
-        fwrite(&x, sizeof(x), 1, fptr);
-        printf("\nKitty is saved");
-        fclose(fptr);
+        scanf("%s", &check);
+        switch (check)
+        {
+        case 'y':
+        case 'Y':
+            fwrite(&x, sizeof(x), 1, fptr);
+            printf("\nKitty is saved");
+            fclose(fptr);
+            break;
+        case 'n':
+        case 'N':
+            printf("Kitty is not saved");
+            SubId();
+            break;
+        default:
+            printf("Invalid option, re-input your option");
+            goto SAVE;
+            break;
+        }
         break;
-    case 'n':
-    case 'N':
-        printf("Kitty is not saved");
-        SubId();
-        break;
-    default:
-        printf("Invalid option");
-        SubId();
-        break;
-    }
-    char again;
+    } while (1);
     printf("\nDo you want to re-input a new cat(Y/N): ");
-    scanf("%s", &again);
-    if (again == 'y' || again == 'Y')
+REINPUT:
+    do
     {
-        system("cls");
-        CreateCat();
-    }
+        scanf("%s", &check);
+        if (check == 'y' || check == 'Y')
+        {
+            system("cls");
+            CreateCat();
+        }
+        else if (check == 'n' || check == 'N')
+        {
+            break;
+        }
+        else
+        {
+            goto REINPUT;
+        }
+
+    } while (1);
 }
 
 void UI_Menu()
