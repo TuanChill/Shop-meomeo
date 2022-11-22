@@ -6,8 +6,10 @@
 #include <unistd.h>
 
 #define folderDirectory "C:/KittyCat/"
-#define folderCatData "C:/KittyCat/CatData"
+#define fileCatData "C:/KittyCat/CatData"
+#define fileProductData "C:/KittyCat/ProductData"
 #define fileCatID "C:/KittyCat/CatID"
+#define fileProductID "C:/KittyCat/ProductID"
 
 void create_folder()
 {
@@ -27,27 +29,40 @@ struct cat
 
 typedef struct cat CAT;
 
-void SubId()
+struct product
 {
+    int id;
+    char name[20];
+    int quantity;
+    char expiry[20];
+    unsigned int price;
+};
+
+typedef struct product Pdt;
+
+void SubId(int opt)
+{
+    //! opt 1- cat, opt 2- product
     int fileID;
     FILE *fptr;
-    fptr = fopen(fileCatID, "rb");
+    fptr = fopen(opt == 1 ? fileCatID : fileProductID, "rb");
     fscanf(fptr, "%d", &fileID);
     fileID -= 1;
     fclose(fptr);
-    fptr = fopen(fileCatID, "wb");
+    fptr = fopen(opt == 1 ? fileCatID : fileProductID, "wb");
     fprintf(fptr, "%d", fileID);
     fclose(fptr);
 }
 
-int GenerateIdCat()
+int GenerateId(int opt)
 {
+    //! opt 1- cat, opt 2- product
     int fileID;
     FILE *fptr;
-    if ((fptr = fopen(fileCatID, "rb")) == NULL)
+    if ((fptr = fopen(opt == 1 ? fileCatID : fileProductID, "rb")) == NULL)
     {
         int id = 1;
-        fptr = fopen(fileCatID, "wb");
+        fptr = fopen(opt == 1 ? fileCatID : fileProductID, "wb");
         fprintf(fptr, "%d", id);
         fclose(fptr);
 
@@ -58,11 +73,114 @@ int GenerateIdCat()
         fscanf(fptr, "%d", &fileID);
         fileID += 1;
         fclose(fptr);
-        fptr = fopen(fileCatID, "wb");
+        fptr = fopen(opt == 1 ? fileCatID : fileProductID, "wb");
         fprintf(fptr, "%d", fileID);
         fclose(fptr);
 
         return fileID;
+    }
+}
+
+void CreateProduct()
+{
+    Pdt x;
+    char check;
+    int productId = GenerateId(2);
+    char dir[30] = fileProductData;
+    FILE *fptr;
+    if ((fptr = fopen(dir, "ab")) == NULL)
+    {
+        printf("Error opening/creating file!!\n");
+        exit(0);
+    }
+
+    puts("\t\t\t==============================");
+    puts("\t\t\t     Create a new Product  ");
+    puts("\t\t\t==============================");
+    puts("\t\t\t* * * * * * * * * * * * * * * *");
+    // input data of cat
+    printf("\nInput your product: ");
+    fflush(stdin);
+    gets(x.name);
+    printf("\nInput the price of your product: ");
+    fflush(stdin);
+    scanf("%u", &x.price);
+    while (x.price <= 0)
+    {
+        printf("\nInvalid value of price, please re-input it");
+        scanf("%u", &x.price);
+    }
+    printf("\nInput the quantity of your product: ");
+    scanf("%d", x.quantity);
+    while (x.quantity < 0)
+    {
+        printf("\nInvalid value of quantity, please re-input it");
+        scanf("%d", &x.quantity);
+    }
+    fflush(stdin);
+    printf("\nInput the expiry of your product: ");
+    gets(x.expiry);
+    x.id = productId;
+    fflush(stdin);
+    // output data of product you entered
+    system("cls");
+    printf("\nYour information of product that you have entered:");
+    printf("\n*********************************************");
+    printf("\nProduct name: %s", x.name);
+    printf("\nProduct ID %d", x.id);
+    printf("\nProduct price: %d VND", x.price);
+    printf("\nProduct quantity: %d", x.quantity);
+    printf("\nProduct expiry: %s", x.expiry);
+    printf("\n*********************************************");
+    printf("\nDo you want to save this product(Y/N): ");
+SAVE:
+    while (1)
+    {
+        scanf("%c", &check);
+        switch (check)
+        {
+        case 'y':
+        case 'Y':
+            fwrite(&x, sizeof(x), 1, fptr);
+            printf("\nProduct is saved");
+            fclose(fptr);
+            break;
+        case 'n':
+        case 'N':
+            printf("\nProduct is not saved");
+            SubId(2);
+            break;
+        default:
+            printf("\nInvalid option, re-input your choice: ");
+            scanf("%c", &check);
+            goto SAVE;
+            break;
+        }
+        break;
+    }
+    fflush(stdin);
+    printf("\nDo you want to re-input a new product(Y/N): ");
+    char reInput;
+REINPUT:
+    while (1)
+    {
+        scanf("%c", &reInput);
+        switch (reInput)
+        {
+        case 'y':
+        case 'Y':
+            system("cls");
+            CreateProduct();
+            break;
+        case 'n':
+        case 'N':
+            break;
+        default:
+            printf("\nInvalid option, re-input your choice: ");
+            scanf("%c", &reInput);
+            break;
+        }
+        break;
     }
 }
 
@@ -71,8 +189,8 @@ void CreateCat()
 
     CAT x;
     char check;
-    int CatId = GenerateIdCat();
-    char dir[20] = folderCatData;
+    int CatId = GenerateId(1);
+    char dir[20] = fileCatData;
     FILE *fptr;
     if ((fptr = fopen(dir, "ab")) == NULL)
     {
@@ -134,12 +252,13 @@ void CreateCat()
     {
         printf("\nYour kitty is not vaccinated");
     }
+    fflush(stdin);
     printf("\n*********************************************");
     printf("\nDo you want to save this kitty(Y/N): ");
 SAVE:
-    do
+    while (1)
     {
-        scanf("%s", &check);
+        scanf("%c", &check);
         switch (check)
         {
         case 'y':
@@ -150,36 +269,42 @@ SAVE:
             break;
         case 'n':
         case 'N':
-            printf("Kitty is not saved");
-            SubId();
+            printf("\nKitty is not saved");
+            SubId(1);
             break;
         default:
-            printf("Invalid option, re-input your option");
+            printf("\nInvalid option, re-input your option: ");
+            scanf("%c", &check);
             goto SAVE;
             break;
         }
         break;
-    } while (1);
+    }
+    fflush(stdin);
     printf("\nDo you want to re-input a new cat(Y/N): ");
+    char reInput;
 REINPUT:
-    do
+    while (1)
     {
-        scanf("%s", &check);
-        if (check == 'y' || check == 'Y')
+        scanf("%c", &reInput);
+        switch (reInput)
         {
+        case 'y':
+        case 'Y':
             system("cls");
             CreateCat();
-        }
-        else if (check == 'n' || check == 'N')
-        {
+            break;
+        case 'n':
+        case 'N':
+            break;
+        default:
+            printf("\nInvalid option, re-input your choice: ");
+            scanf("%c", &reInput);
+            goto REINPUT;
             break;
         }
-        else
-        {
-            goto REINPUT;
-        }
-
-    } while (1);
+        break;
+    }
 }
 
 void UI_Menu()
@@ -237,6 +362,7 @@ int main()
 {
     create_folder();
     // UI_Menu();
+    // CreateProduct();
     CreateCat();
     return 0;
 }
