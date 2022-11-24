@@ -23,11 +23,11 @@ struct cat
     char name[20];
     float weight;
     char type[20];
-    int sex;         // 0-female or 1-male
-    int vaccination; // 1 yes- 0 not
+    int sex;         // 0 - female or 1 - male
+    int vaccination; // 0 - not or 1 - yes
 };
-
 typedef struct cat CAT;
+CAT x; //
 
 struct product
 {
@@ -37,12 +37,12 @@ struct product
     char expiry[20];
     unsigned int price;
 };
-
-typedef struct product Pdt;
+typedef struct product PDT;
+PDT y;
 
 void SubId(int opt)
 {
-    //! opt 1- cat, opt 2- product
+    //! opt 1 - cat, opt 2 - product
     int fileID;
     FILE *fptr;
     fptr = fopen(opt == 1 ? fileCatID : fileProductID, "rb");
@@ -56,7 +56,7 @@ void SubId(int opt)
 
 int GenerateId(int opt)
 {
-    //! opt 1- cat, opt 2- product
+    //! opt 1 - cat, opt 2 - product
     int fileID;
     FILE *fptr;
     if ((fptr = fopen(opt == 1 ? fileCatID : fileProductID, "rb")) == NULL)
@@ -65,7 +65,6 @@ int GenerateId(int opt)
         fptr = fopen(opt == 1 ? fileCatID : fileProductID, "wb");
         fprintf(fptr, "%d", id);
         fclose(fptr);
-
         return 1;
     }
     else
@@ -76,24 +75,21 @@ int GenerateId(int opt)
         fptr = fopen(opt == 1 ? fileCatID : fileProductID, "wb");
         fprintf(fptr, "%d", fileID);
         fclose(fptr);
-
         return fileID;
     }
 }
 
 void CreateProduct()
 {
-    Pdt x;
     char check;
     int productId = GenerateId(2);
-    char dir[30] = fileProductData;
+    // char dir[30] = fileProductData;
     FILE *fptr;
-    if ((fptr = fopen(dir, "ab")) == NULL)
+    if ((fptr = fopen(fileProductData, "ab")) == NULL)
     {
         printf("Error opening/creating file!!\n");
         exit(0);
     }
-
     puts("\t\t\t==============================");
     puts("\t\t\t     Create a new Product  ");
     puts("\t\t\t==============================");
@@ -101,36 +97,37 @@ void CreateProduct()
     // input data of cat
     printf("\nInput your product: ");
     fflush(stdin);
-    gets(x.name);
+    gets(y.name);
     printf("\nInput the price of your product: ");
     fflush(stdin);
-    scanf("%u", &x.price);
-    while (x.price <= 0)
+    scanf("%u", &y.price);
+    while (y.price <= 0)
     {
         printf("\nInvalid value of price, please re-input it");
-        scanf("%u", &x.price);
+        scanf("%u", &y.price);
     }
     printf("\nInput the quantity of your product: ");
-    scanf("%d", x.quantity);
-    while (x.quantity < 0)
+    fflush(stdin);
+    scanf("%d", &y.quantity);
+    while (y.quantity < 0)
     {
         printf("\nInvalid value of quantity, please re-input it");
-        scanf("%d", &x.quantity);
+        scanf("%d", &y.quantity);
     }
     fflush(stdin);
     printf("\nInput the expiry of your product: ");
-    gets(x.expiry);
-    x.id = productId;
+    gets(y.expiry);
+    y.id = productId;
     fflush(stdin);
     // output data of product you entered
     system("cls");
     printf("\nYour information of product that you have entered:");
     printf("\n*********************************************");
-    printf("\nProduct name: %s", x.name);
-    printf("\nProduct ID %d", x.id);
-    printf("\nProduct price: %d VND", x.price);
-    printf("\nProduct quantity: %d", x.quantity);
-    printf("\nProduct expiry: %s", x.expiry);
+    printf("\nProduct ID %d", y.id);
+    printf("\nProduct name: %s", y.name);
+    printf("\nProduct price: %d VND", y.price);
+    printf("\nProduct quantity: %d", y.quantity);
+    printf("\nProduct expiry: %s", y.expiry);
     printf("\n*********************************************");
     printf("\nDo you want to save this product(Y/N): ");
 SAVE:
@@ -141,7 +138,7 @@ SAVE:
         {
         case 'y':
         case 'Y':
-            fwrite(&x, sizeof(x), 1, fptr);
+            fwrite(&y, sizeof(y), 1, fptr);
             printf("\nProduct is saved");
             fclose(fptr);
             break;
@@ -186,18 +183,15 @@ REINPUT:
 
 void CreateCat()
 {
-
-    CAT x;
     char check;
     int CatId = GenerateId(1);
-    char dir[20] = fileCatData;
+    // char dir[20] = fileCatData;
     FILE *fptr;
-    if ((fptr = fopen(dir, "ab")) == NULL)
+    if ((fptr = fopen(fileCatData, "ab")) == NULL)
     {
         printf("Error opening/creating file!!\n");
         exit(0);
     }
-
     puts("\t\t\t==============================");
     puts("\t\t\t     Create a new Kitty  ");
     puts("\t\t\t==============================");
@@ -232,8 +226,8 @@ void CreateCat()
     system("cls");
     printf("\nYour information of kitty that you have entered:");
     printf("\n*********************************************");
-    printf("\nKitty name: %s", x.name);
     printf("\nKitty ID %d", x.id);
+    printf("\nKitty name: %s", x.name);
     printf("\nKitty weight: %.1f", x.weight);
     printf("\nKitty type: %s", x.type);
     if (x.sex)
@@ -307,6 +301,184 @@ REINPUT:
     }
 }
 
+int checkCatAvailable(int catID)
+{
+    // check if the Kitty ID is available or not
+    FILE *fptr;
+    char dir[30] = fileCatData;
+    fptr = fopen(dir, "rb");
+    while (!feof(fptr))
+    {
+        fread(&x, sizeof(x), 1, fptr);
+        if (catID == x.id)
+        {
+            fclose(fptr);
+            return 1;
+        }
+        else
+        {
+            fclose(fptr);
+            return 0;
+        }
+    }
+}
+
+void searchCats()
+{
+    FILE *fptr;
+    char dir[30] = fileCatData;
+    int catID, searchID;
+    if ((fptr = fopen(dir, "rb")) == NULL)
+    {
+        printf("File not found!");
+    }
+    fflush(stdin);
+    printf("> Enter the Kitty ID to search: ");
+    scanf("%d", &searchID);
+    if (checkCatAvailable(catID) == 0)
+    {
+        printf("\nKitty ID is invalid! Kitty not found!");
+    }
+    while (fread(&x, sizeof(x), 1, fptr) == 1)
+    {
+        if (searchID == x.id)
+        {
+            system("cls");
+            printf("\n\tKitty %s say hello!", x.name);
+            printf("\n*********************************************");
+            printf("\n- Kitty ID: %d", x.id);
+            printf("\n- Kitty name: %s", x.name);
+            printf("\n- Kitty weight: %.1f", x.weight);
+            printf("\n- Kitty type: %s", x.type);
+            if (x.sex == 1)
+                printf("\n- Sex: Male");
+            else
+                printf("\n- Sex: Female");
+            if (x.vaccination == 1)
+                printf("\n- Vaccinate status: Vaccinated");
+            else
+                printf("\n- Vaccinate status: Not vaccinated");
+        }
+    }
+    char reSearch1;
+    printf("\n> Do you want to search for another kitty? (Y/N): ");
+REINPUT1:
+    scanf("%s", &reSearch1);
+    switch (reSearch1)
+    {
+    case 'y':
+    case 'Y':
+        system("cls");
+        searchCats();
+        break;
+    case 'n':
+    case 'N':
+        break;
+    default:
+        printf("Invalid option, please reinput your choice: ");
+        goto REINPUT1;
+        break;
+    }
+    fclose(fptr);
+}
+
+int checkProductAvailable(int productID)
+{
+    // check if the Product ID is available or not
+    FILE *fptr;
+    char dir[30] = fileProductData;
+    fptr = fopen(dir, "rb");
+    while (!feof(fptr))
+    {
+        fread(&y, sizeof(y), 1, fptr);
+        if (productID == y.id)
+        {
+            fclose(fptr);
+            return 1;
+        }
+        else
+        {
+            fclose(fptr);
+            return 0;
+        }
+    }
+}
+
+void searchProducts()
+{
+    FILE *fptr;
+    char dir[30] = fileProductData;
+    int productID, searchID;
+    if ((fptr = fopen(dir, "rb")) == NULL)
+    {
+        printf("File not found!");
+    }
+    fflush(stdin);
+    printf("> Enter the Product ID to search: ");
+    scanf("%d", &searchID);
+    if (checkProductAvailable(productID) == 0)
+    {
+        printf("\nProduct ID is invalid! Product not found!");
+    }
+    while (fread(&y, sizeof(y), 1, fptr) == 1)
+    {
+        if (searchID == y.id)
+        {
+            system("cls");
+            printf("\nInformation of the product you search");
+            printf("\n*********************************************");
+            printf("\n- Product ID: %d", y.id);
+            printf("\n- Product name: %s", y.name);
+            printf("\n- Product price: %dVND", y.price);
+            printf("\n- Product quantity: %d", y.quantity);
+            printf("\n- Product expiry: %s", y.expiry);
+        }
+    }
+    char reSearch2;
+    printf("\n> Do you want to search for another product? (Y/N): ");
+REINPUT2:
+    scanf("%s", &reSearch2);
+    switch (reSearch2)
+    {
+    case 'y':
+    case 'Y':
+        system("cls");
+        searchProducts();
+        break;
+    case 'n':
+    case 'N':
+        break;
+    default:
+        printf("Invalid option, please reinput your choice: ");
+        goto REINPUT2;
+        break;
+    }
+    fclose(fptr);
+}
+
+void searchFunc()
+{
+    int searchChoice;
+    printf("=========== SEARCH ============");
+    printf("\n1. Search Cats");
+    printf("\n2. Search Products");
+    printf("\n\n> What do you want to search: ");
+    scanf("%d", &searchChoice);
+    switch (searchChoice)
+    {
+    case 1:
+        searchCats();
+        break;
+    case 2:
+        searchProducts();
+        break;
+    default:
+        printf("\nNo choices were made! Return to the search menu\n");
+        searchFunc();
+        break;
+    }
+}
+
 void UI_Menu()
 {
     // demo UI
@@ -363,6 +535,7 @@ int main()
     create_folder();
     // UI_Menu();
     // CreateProduct();
-    CreateCat();
+    // CreateCat();
+    searchFunc();
     return 0;
 }
