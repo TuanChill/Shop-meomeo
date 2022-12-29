@@ -5,13 +5,38 @@
 #include <windows.h>
 #include <unistd.h>
 #include <time.h>
+#include <time.h>
 
 #define folderDirectory "C:/KittyCat/"
 
 #define fileUserData "C:/KittyCat/UserData"
 
+#define fileUserData "C:/KittyCat/UserData"
+
 #define fileCatID "C:/KittyCat/CatID"
 #define fileProductID "C:/KittyCat/ProductID"
+#define fileEmployeeID "C:/KittyCat/EmployeeID"
+
+#define fileCatData "C:/KittyCat/CatData"
+#define fileProductData "C:/KittyCat/ProductData"
+#define fileEmployeeData "C:/KittyCat/EmployeeData"
+
+#define tempCatData "C:/KittyCat/tempCatData"
+#define tempProductData "C:/KittyCat/tempProductData"
+#define tempEmployeeData "C:/KittyCat/tempEmployeeData"
+
+void delay(int number_of_seconds)
+{
+    // Converting time into milli_seconds
+    int milli_seconds = 1000 * number_of_seconds;
+
+    // Storing start time
+    clock_t start_time = clock();
+
+    // looping till required time is not achieved
+    while (clock() < start_time + milli_seconds)
+        ;
+}
 #define fileEmployeeID "C:/KittyCat/EmployeeID"
 
 #define fileCatData "C:/KittyCat/CatData"
@@ -117,8 +142,12 @@ void ExitToMenu()
 void SubId(int opt)
 {
     //! opt 1 - cat, opt 2 - product, 3 - employee
+    //! opt 1 - cat, opt 2 - product, 3 - employee
     int fileID;
     FILE *fptr;
+    fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
+                                                 : fileEmployeeID,
+                 "rb");
     fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
                                                  : fileEmployeeID,
                  "rb");
@@ -128,39 +157,51 @@ void SubId(int opt)
     fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
                                                  : fileEmployeeID,
                  "wb");
+    fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
+                                                 : fileEmployeeID,
+                 "wb");
     fprintf(fptr, "%d", fileID);
     fclose(fptr);
 }
 
 int GenerateId(int opt)
 {
-    //! opt 1 - cat, opt 2 - product, 3 - employee
+    //! opt 1 - cat, opt 2 - product, 3 - employee, 3 - employee
     int fileID;
     FILE *fptr;
     if ((fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
                                                       : fileEmployeeID,
                       "rb")) == NULL)
-    {
-        int id = 1;
-        fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
-                                                     : fileEmployeeID,
-                     "wb");
-        fprintf(fptr, "%d", id);
-        fclose(fptr);
-        return 1;
-    }
-    else
-    {
-        fscanf(fptr, "%d", &fileID);
-        fileID += 1;
-        fclose(fptr);
-        fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
-                                                     : fileEmployeeID,
-                     "wb");
-        fprintf(fptr, "%d", fileID);
-        fclose(fptr);
-        return fileID;
-    }
+        if ((fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
+                                                          : fileEmployeeID,
+                          "rb")) == NULL)
+        {
+            int id = 1;
+            fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
+                                                         : fileEmployeeID,
+                         "wb");
+            fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
+                                                         : fileEmployeeID,
+                         "wb");
+            fprintf(fptr, "%d", id);
+            fclose(fptr);
+            return 1;
+        }
+        else
+        {
+            fscanf(fptr, "%d", &fileID);
+            fileID += 1;
+            fclose(fptr);
+            fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
+                                                         : fileEmployeeID,
+                         "wb");
+            fptr = fopen(opt == 1 ? fileCatID : opt == 2 ? fileProductID
+                                                         : fileEmployeeID,
+                         "wb");
+            fprintf(fptr, "%d", fileID);
+            fclose(fptr);
+            return fileID;
+        }
 }
 
 void login()
@@ -272,6 +313,7 @@ void userAuthMenu()
 void CreateProduct()
 {
     system("cls");
+    system("cls");
     char check;
     int productId = GenerateId(2);
     // char dir[30] = fileProductData;
@@ -372,6 +414,7 @@ SAVE:
 
 void CreateCat()
 {
+    system("cls");
     system("cls");
     char check;
     int CatId = GenerateId(1);
@@ -849,8 +892,12 @@ void searchFunc()
     {
     case 1:
         searchEmployees();
+        searchEmployees();
         break;
     case 2:
+        searchCats();
+        break;
+    case 3:
         searchCats();
         break;
     case 3:
@@ -866,10 +913,15 @@ void searchFunc()
     }
 }
 
-void ShowData(int opt)
+void ShowData(int opt) void ShowData(int opt)
 {
     // ! 1 - cat, 2 - products, 3 - employees
     FILE *fptr;
+    if ((fptr = fopen(opt == 1 ? fileCatData : opt == 2 ? fileProductData
+                                                        : fileEmployeeData,
+                      "rb")) == NULL)
+        // ! 1 - cat, 2 - products, 3 - employees
+        FILE *fptr;
     if ((fptr = fopen(opt == 1 ? fileCatData : opt == 2 ? fileProductData
                                                         : fileEmployeeData,
                       "rb")) == NULL)
@@ -1639,6 +1691,7 @@ void update(int opt)
 int main()
 {
     create_folder();
+    userAuthMenu();
     userAuthMenu();
     return 0;
 }
